@@ -1,0 +1,24 @@
+{
+  "locale": 3,
+  "server": {
+    "port": 9903,
+    "readTimeout": "60s",
+    "writeTimeout": "60s",
+    "maxHeaderBytes": 1024
+  },
+  "handler": {
+    "requestTimeout": "20s"
+  },
+  "service": {
+    "mode": "dev",
+    "accessTTL": "30m",
+    "refreshTTL": "24h",
+    "periods": {
+      "listener": "500ms",
+      "jwtCheckPeriod": "2s"
+    }
+  },
+  "repository": {
+    "userTokensTTL": "300s"
+  }
+}
