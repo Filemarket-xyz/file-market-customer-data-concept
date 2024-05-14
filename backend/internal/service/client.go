@@ -7,8 +7,6 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/config"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/domain"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/repository"
-	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/hash"
-	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/jwtoken"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
 	"github.com/ethereum/go-ethereum/common"
@@ -18,10 +16,8 @@ import (
 type ClientService struct {
 	cfg              *config.ServiceConfig
 	repoUsers        repository.Users
-	repoJWTokens     repository.JWTokens
+	repoDatasets     repository.Datasets
 	repoTransactions repository.Transactions
-	jwtManager       jwtoken.JWTokenManager
-	hashManager      hash.HashManager
 	timeManager      time_manager.TimeManager
 	logging          logger.Logger
 }
@@ -29,6 +25,7 @@ type ClientService struct {
 func NewClientService(
 	cfg *config.ServiceConfig,
 	repoUsers repository.Users,
+	repoDatasets repository.Datasets,
 	repoTransactions repository.Transactions,
 	timeManager time_manager.TimeManager,
 	logging logger.Logger,
@@ -37,10 +34,55 @@ func NewClientService(
 	return &ClientService{
 		cfg:              cfg,
 		repoUsers:        repoUsers,
+		repoDatasets:     repoDatasets,
 		repoTransactions: repoTransactions,
 		timeManager:      timeManager,
 		logging:          logging,
 	}
+}
+
+func (s *ClientService) GetUserDataset(ctx context.Context, user *domain.UserWithTokenNumber) ([][]string, error) {
+	tx, err := s.repoTransactions.BeginTransaction(ctx)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetUserDataset/BeginTransaction: %w", err), InternalError, "")
+	}
+	defer tx.Rollback(ctx)
+
+	if user.Role != domain.RoleClient {
+		return nil, newServiceError(code400,
+			fmt.Errorf("GetUserDataset: %s", UserNotClient), UserNotClient, "")
+	}
+	client, err := s.repoUsers.GetClientById(ctx, tx, user.Id)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetUserDataset/GetClientById: %w", err), InternalError, "")
+	}
+	// if !client.Agreement {
+	// }
+	if !client.Bought {
+		return nil, newServiceError(code400,
+			fmt.Errorf("GetUserDataset: client did not pay"), "The client did not pay for the data set", "")
+	}
+
+	datasets, err := s.repoDatasets.GetDatasetsByClientId(ctx, tx, user.Id)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetUserDataset/GetClientById: %w", err), InternalError, "")
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetUserDataset/Commit: %w", err), InternalError, "")
+	}
+
+	res, err := domain.DatasetsToStrings(datasets)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetUserDataset/DatasetsToStrings: %w", err), InternalError, "")
+	}
+
+	return res, nil
 }
 
 func (s *ClientService) FixingPurchaseDataSet(ctx context.Context, tx repository.Transaction, from common.Address, value decimal.Decimal) error {

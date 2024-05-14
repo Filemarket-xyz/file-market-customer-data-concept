@@ -9,6 +9,7 @@ require (
 	github.com/go-openapi/swag v0.23.0
 	github.com/go-openapi/validate v0.24.0
 	github.com/go-redis/redis/v8 v8.11.5
+	github.com/gocarina/gocsv v0.0.0-20231116093920-b87c2d0e983a
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/mux v1.8.1
 	github.com/jackc/pgx/v5 v5.5.5

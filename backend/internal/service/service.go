@@ -31,7 +31,12 @@ type Auth interface {
 }
 
 type Client interface {
+	GetUserDataset(ctx context.Context, user *domain.UserWithTokenNumber) ([][]string, error)
 	FixingPurchaseDataSet(ctx context.Context, tx repository.Transaction, from common.Address, value decimal.Decimal) error
+}
+
+type Config interface {
+	GetConfig(ctx context.Context) *models.Config
 }
 
 type EthTransactions interface {
@@ -45,6 +50,7 @@ type Listener interface {
 type Service interface {
 	Auth
 	Client
+	Config
 	Listener
 	EthTransactions
 
@@ -54,6 +60,7 @@ type Service interface {
 type service struct {
 	Auth
 	Client
+	Config
 	Listener
 	EthTransactions
 
@@ -84,7 +91,8 @@ func NewService(
 
 		Auth = NewAuthService(cfg, repo.Users, repo.JWTokens, repo.Transactions, jwtTokenManager,
 			hashManager, timeManager, randManager, logging)
-		Client          = NewClientService(cfg, repo.Users, repo.Transactions, timeManager, logging)
+		Config          = NewConfigService(cfg, logging)
+		Client          = NewClientService(cfg, repo.Users, repo.Datasets, repo.Transactions, timeManager, logging)
 		EthTransactions = NewEthTransactionsService(ethClient, logging)
 
 		listener = NewListenerService(cfg, repo.BlockCounterRepo, repo.Transactions, repo.EthTransactions, Client,
@@ -94,6 +102,7 @@ func NewService(
 	res := &service{
 		Auth:            Auth,
 		Client:          Client,
+		Config:          Config,
 		Listener:        listener,
 		EthTransactions: EthTransactions,
 

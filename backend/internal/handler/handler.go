@@ -45,6 +45,7 @@ func (h *handler) corsMiddleware(next http.Handler) http.Handler {
 
 func (h *handler) Init() http.Handler {
 	router := mux.NewRouter()
+	router.HandleFunc("/config", h.GetConfig)
 
 	authRouter := router.PathPrefix("/auth").Subrouter()
 	authRouter.Handle("/refresh", h.CookieRefreshAuthMiddleware((http.HandlerFunc(h.RefreshAuth))))
@@ -53,6 +54,9 @@ func (h *handler) Init() http.Handler {
 	authRouter.Handle("/try", h.CookieAuthMiddleware((http.HandlerFunc(h.TryAuth))))
 	authRouter.HandleFunc("/message", h.AuthMessage)
 	authRouter.HandleFunc("/by_signature", h.AuthByMessage)
+
+	clientRouter := router.PathPrefix("/client").Subrouter()
+	clientRouter.Handle("/dataset/download", h.CookieAuthMiddleware((http.HandlerFunc(h.DownloadDataset))))
 
 	router.Use(h.corsMiddleware)
 	return router

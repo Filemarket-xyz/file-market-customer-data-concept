@@ -71,6 +71,10 @@ func (h *handler) AuthMessage(w http.ResponseWriter, r *http.Request) {
 		h.makeErrorResponse(w, r, makeValidationError("handleAuthMessage", err), code400)
 		return
 	}
+	if err := addressValidation(*req.Address); err != nil {
+		h.makeErrorResponse(w, r, makeValidationError("handleAuthMessage", err), code400)
+		return
+	}
 	ctx, cancel := context.WithTimeout(r.Context(), h.cfg.RequestTimeout)
 	defer cancel()
 
@@ -93,10 +97,13 @@ func (h *handler) AuthByMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := req.Validate(h.validationFormats); err != nil {
-		h.makeErrorResponse(w, r, makeValidationError("handleAuthByMessage", err), code400)
+		h.makeErrorResponse(w, r, makeValidationError("AuthByMessage", err), code400)
 		return
 	}
-
+	if err := addressValidation(*req.Address); err != nil {
+		h.makeErrorResponse(w, r, makeValidationError("AuthByMessage", err), code400)
+		return
+	}
 	ctx, cancel := context.WithTimeout(r.Context(), h.cfg.RequestTimeout)
 	defer cancel()
 
@@ -142,7 +149,7 @@ func (h *handler) TryAuth(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 	user, ok := ctx.Value(CtxKeyUser).(*domain.UserWithTokenNumber)
 	if !ok {
-		h.makeErrorResponse(w, r, errors.New("RefreshAuth"), code500)
+		h.makeErrorResponse(w, r, errors.New("TryAuth"), code500)
 		return
 	}
 

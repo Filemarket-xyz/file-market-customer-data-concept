@@ -129,6 +129,42 @@ paths:
           description: Ошибка
           schema:
             $ref: '#/definitions/ErrorResponse'
+  /config:
+    get:
+      tags:
+        - config
+      description: Конфиг
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Конфиг
+          schema:
+            $ref: '#/definitions/Config'
+        default:
+          description: Ошибка
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /client/dataset/download:
+    get:
+      tags:
+        - client
+      description: Выгрузка датасета клиента
+      produces:
+        - text/csv
+      responses:
+        200:
+          description: Скачивание датасета
+          schema:
+              type: string
+        default:
+          description: Ошибка
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
+
 definitions:
   AuthRequest:
     type: object
@@ -215,6 +251,20 @@ definitions:
       point_balance:
         type: string
 
+  Config:
+    description: Конфиг
+    type: object
+    required:
+      - wallet_address
+      - dataset_cost
+    properties:
+      wallet_address:
+        description: адрес кошелька, куда переводить нативку для покупки датасета
+        type: string
+      dataset_cost:
+        description: стоимость датасета в децималс
+        type: string
+
   Transaction:
     description: Данные транзакции
     type: object
@@ -279,3 +329,5 @@ securityDefinitions:
 
 tags:
   - name: auth
+  - name: config
+  - name: client

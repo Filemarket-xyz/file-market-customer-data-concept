@@ -13,6 +13,7 @@ const (
 	UserNotExist        = "user doesn't exist"
 	AuthMessageNotExist = "auth message doesn't exist"
 	ParseTokenFailed    = "parse token failed"
+	UserNotClient       = "the user is not a client"
 
 	TokenWrongSecret   = "wrong token secret"
 	AuthMessageExpired = "auth message expired"

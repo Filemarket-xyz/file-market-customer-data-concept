@@ -26,6 +26,10 @@ type Users interface {
 	DeleteAuthMessage(ctx context.Context, tx Transaction, address string) error
 }
 
+type Datasets interface {
+	GetDatasetsByClientId(ctx context.Context, tx Transaction, id int64) ([]*domain.Dataset, error)
+}
+
 type BlockCounterRepo interface {
 	GetLastBlock(ctx context.Context) (*big.Int, error)
 	SetLastBlock(ctx context.Context, lastBlock *big.Int) error
@@ -55,6 +59,7 @@ type Transactions interface {
 
 type Repository struct {
 	Users
+	Datasets
 	BlockCounterRepo
 	EthTransactions
 	JWTokens
@@ -65,6 +70,7 @@ type Repository struct {
 func NewRepository(cfg *config.Config, rdb *redis.Client, pool *pgxpool.Pool) (*Repository, error) {
 	return &Repository{
 		Users:            NewUsersRepo(cfg.Redis, rdb),
+		Datasets:         NewDatasetsRepo(),
 		BlockCounterRepo: NewBlockCounter(rdb),
 		EthTransactions:  NewEthTransactionsRepo(),
 		JWTokens:         NewJWTokensRepo(),

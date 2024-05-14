@@ -76,7 +76,7 @@ func (s *AuthService) AuthByToken(
 		return nil, newServiceError(code500,
 			fmt.Errorf("GetUserByToken/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	return s.getAuthRespByIdAndRole(ctx, tx, user.Id, user.Role)
 }
@@ -116,7 +116,7 @@ func (s *AuthService) GetUserByJWToken(
 		return nil, newServiceError(code500,
 			fmt.Errorf("GetUserByJWToken/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	tokenData, err := s.jwtManager.ParseToken(token)
 	if err != nil {
@@ -167,7 +167,7 @@ func (s *AuthService) RefreshJWTokens(
 		return nil, nil, newServiceError(code500,
 			fmt.Errorf("RefreshJWTokens/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	if err := s.repoJWTokens.Drop(ctx, tx, user.Id, int(user.Role), user.Number); err != nil {
 		return nil, nil, newServiceError(code500,
@@ -205,7 +205,7 @@ func (s *AuthService) Logout(ctx context.Context, user *domain.UserWithTokenNumb
 		return newServiceError(code500,
 			fmt.Errorf("Logout/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	if err := s.repoJWTokens.Drop(ctx, tx, user.Id, int(user.Role), user.Number); err != nil {
 		return newServiceError(code500,
@@ -225,7 +225,7 @@ func (s *AuthService) FullLogout(ctx context.Context, user *domain.UserWithToken
 		return newServiceError(code500,
 			fmt.Errorf("FullLogout/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	if err := s.repoJWTokens.DropAll(ctx, tx, user.Id, int(user.Role)); err != nil {
 		return newServiceError(code500,
@@ -248,7 +248,7 @@ func (s *AuthService) GetAuthMessage(
 		return nil, newServiceError(code500,
 			fmt.Errorf("GetAuthMessage/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	msg, err := s.repoUsers.GetAuthMessageByAddress(ctx, tx, *req.Address)
 	if err != nil && !errors.Is(err, repository.ErrNoRows) {
@@ -294,7 +294,7 @@ func (s *AuthService) AuthByMessage(
 		return nil, nil, newServiceError(code500,
 			fmt.Errorf("AuthByMessage/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	msg, err := s.repoUsers.GetAuthMessageByAddress(ctx, tx, *req.Address)
 	if err != nil {
@@ -483,7 +483,7 @@ func (s *AuthService) DropExpiredTokens(ctx context.Context) error {
 		return newServiceError(code500,
 			fmt.Errorf("DropExpiredTokens/BeginTransaction: %w", err), InternalError, "")
 	}
-	defer tx.Rollback(context.Background())
+	defer tx.Rollback(ctx)
 
 	err = s.repoJWTokens.DropAllExpired(ctx, tx, jwtoken.PurposeAccess, s.timeManager.Now().UnixMilli())
 	if err != nil {
