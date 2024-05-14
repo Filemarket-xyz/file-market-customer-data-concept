@@ -14,9 +14,10 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/repository"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/ethclient"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
-	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/go-redis/redis/v8"
+	"github.com/shopspring/decimal"
 	"go.uber.org/zap"
 )
 
@@ -25,6 +26,8 @@ type ListenerService struct {
 	repoBlockCounter    repository.BlockCounterRepo
 	repoTransactions    repository.Transactions
 	repoEthTransactions repository.EthTransactions
+
+	Client Client
 
 	ethClient ethclient.Client
 
@@ -39,6 +42,8 @@ func NewListenerService(
 	repoTransactions repository.Transactions,
 	repoEthTransactions repository.EthTransactions,
 
+	Client Client,
+
 	ethClient ethclient.Client,
 
 	logging logger.Logger,
@@ -51,6 +56,8 @@ func NewListenerService(
 		repoTransactions:    repoTransactions,
 		repoEthTransactions: repoEthTransactions,
 
+		Client: Client,
+
 		ethClient: ethClient,
 
 		logging: logging,
@@ -59,11 +66,11 @@ func NewListenerService(
 	}
 }
 
-func (s *ListenerService) listenBlockchain() error {
-	lastBlock, err := s.repoBlockCounter.GetLastBlock(context.Background())
+func (s *ListenerService) listenBlockchain(ctx context.Context) error {
+	lastBlock, err := s.repoBlockCounter.GetLastBlock(ctx)
 	if err != nil {
 		if err == redis.Nil {
-			latestBlock, err := s.ethClient.GetLatestBlockNumber(context.Background())
+			latestBlock, err := s.ethClient.GetLatestBlockNumber(ctx)
 			if err != nil {
 				log.Panicln(err)
 				return err
@@ -77,7 +84,7 @@ func (s *ListenerService) listenBlockchain() error {
 		for {
 			select {
 			case <-time.After(s.cfg.Periods.ListenerPeriod):
-				current, err := s.checkBlock(lastBlock)
+				current, err := s.checkBlock(ctx, lastBlock)
 				if err != nil {
 					s.logging.Errorf("process block failed: ", err)
 				}
@@ -90,10 +97,10 @@ func (s *ListenerService) listenBlockchain() error {
 	return nil
 }
 
-func (s *ListenerService) checkBlock(latest *big.Int) (*big.Int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 13*time.Second)
+func (s *ListenerService) checkBlock(ctx context.Context, latest *big.Int) (*big.Int, error) {
+	ctx2, cancel := context.WithTimeout(ctx, 13*time.Second)
 	defer cancel()
-	blockNum, err := s.ethClient.GetLatestBlockNumber(ctx)
+	blockNum, err := s.ethClient.GetLatestBlockNumber(ctx2)
 	if err != nil {
 		s.logging.Error("get latest block failed: ", err)
 		return latest, err
@@ -102,7 +109,7 @@ func (s *ListenerService) checkBlock(latest *big.Int) (*big.Int, error) {
 		s.logging.Info("processing block difference: ", latest.String(), " ", blockNum.String())
 	}
 	for blockNum.Cmp(latest) != 0 {
-		latest, err = s.checkSingleBlock(latest)
+		latest, err = s.checkSingleBlock(ctx, latest)
 		if err != nil {
 			return latest, err
 		}
@@ -110,50 +117,50 @@ func (s *ListenerService) checkBlock(latest *big.Int) (*big.Int, error) {
 	return latest, nil
 }
 
-func (s *ListenerService) checkSingleBlock(latest *big.Int) (*big.Int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (s *ListenerService) checkSingleBlock(ctx context.Context, latest *big.Int) (*big.Int, error) {
+	ctx2, cancel := context.WithTimeout(ctx, 10*time.Second)
 	defer cancel()
 	pending := big.NewInt(0).Add(latest, big.NewInt(1))
-	block, err := s.ethClient.CustomBlockByNumber(ctx, hexutil.EncodeBig(pending), true)
+	block, err := s.ethClient.BlockByNumber(ctx2, pending)
 	if err != nil {
 		s.logging.Error("get pending block failed ", pending.String(), " ", err)
 		return latest, err
 	} else {
-		if err := s.processBlock(block); err != nil {
+		if err := s.processBlock(ctx, block); err != nil {
 			s.logging.Error("process block failed ", err)
 			return latest, err
 		}
 	}
-	if err := s.repoBlockCounter.SetLastBlock(context.Background(), pending); err != nil {
+	if err := s.repoBlockCounter.SetLastBlock(ctx, pending); err != nil {
 		s.logging.Error("set last block failed ", err)
 	}
 	return pending, err
 }
 
-func (s *ListenerService) processBlock(block *types.Block) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 600*time.Second)
+func (s *ListenerService) processBlock(ctx context.Context, block *types.Block) error {
+	ctx2, cancel := context.WithTimeout(ctx, 600*time.Second)
 	defer cancel()
-	logs, err := s.ethClient.GetLogs(ctx, block.Number(), block.Number())
-	if err != nil {
-		return fmt.Errorf("process block get logs failed: %w", err)
-	}
 
 	for _, t := range block.Transactions() {
 		if t.To() == nil {
 			continue
 		}
-		txLogs := logsForTransaction(t.Hash(), logs)
 		to := *t.To()
 
 		if s.cfg.Wallet.Cmp(to) == 0 {
+			from, err := types.Sender(types.LatestSignerForChainID(t.ChainId()), t)
+			if err != nil {
+				return fmt.Errorf("get sender error: %w", err)
+			}
 			if err := s.processTransaction(
-				ctx,
+				ctx2,
 				&domain.Transaction{
 					Id:        strings.ToLower(t.Hash().String()),
 					State:     domain.TransactionStateConfirmed,
 					Timestamp: time.Now().UnixMilli(),
 				},
-				txLogs,
+				from,
+				t.Value(),
 			); err != nil {
 				s.logging.Error("process block tx failed", zap.String("id", t.Hash().String()), zap.Error(err))
 			}
@@ -166,7 +173,8 @@ func (s *ListenerService) processBlock(block *types.Block) error {
 func (s *ListenerService) processTransaction(
 	ctx context.Context,
 	ethTx *domain.Transaction,
-	logs []*types.Log,
+	from common.Address,
+	value *big.Int,
 ) error {
 	tx, err := s.repoTransactions.BeginTransaction(ctx)
 	if err != nil {
@@ -183,15 +191,9 @@ func (s *ListenerService) processTransaction(
 		return nil
 	}
 
-	for i, l := range logs {
-		var err error
-
-		// TODO
-
-		if err != nil {
-			s.logging.Error("processTransaction failed", zap.String("id", ethTx.Id), zap.Int("log_index", i), zap.String("contract address", l.Address.String()), zap.Error(err))
-			return fmt.Errorf("processTransaction/contract address(%s): %w", l.Address.String(), err)
-		}
+	if err := s.Client.FixingPurchaseDataSet(ctx, tx, from, decimal.NewFromBigInt(value, 0)); err != nil {
+		s.logging.Error("processTransaction/FixingPurchaseDataSet: ", err)
+		return fmt.Errorf("processTransaction/FixingPurchaseDataSet: %w", err)
 	}
 
 	if err := s.repoEthTransactions.InsertTransaction(ctx, tx, &domain.Transaction{

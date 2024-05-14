@@ -10,13 +10,17 @@ type Client struct {
 	Id        int64
 	Address   common.Address
 	Agreement bool
+	Bought    bool
 
 	PointBalance decimal.Decimal
 }
 
 func (c *Client) ToModel() *models.Client {
 	res := &models.Client{
-		ID: c.Id,
+		ID:           c.Id,
+		Agreement:    &c.Agreement,
+		Bought:       c.Bought,
+		PointBalance: c.PointBalance.String(),
 	}
 	return res
 }

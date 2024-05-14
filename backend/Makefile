@@ -13,7 +13,9 @@ postgres.start:
     fi;
 	-docker exec fmconcept-postgres psql -U postgres -c "create user fmconcept password '1337'"
 	-docker exec fmconcept-postgres psql -U postgres -c "create database fmconcept"
-	-docker exec fmconcept-postgres psql -U postgres -c "grant all privileges on database fmconcept to fmconcept"
+	-docker exec fmconcept-postgres psql -U postgres -c "grant all on database fmconcept to fmconcept"
+	-docker exec fmconcept-postgres psql -U postgres -c "ALTER DATABASE fmconcept OWNER TO fmconcept"
+	-docker exec fmconcept-postgres psql -U postgres -c "GRANT ALL ON SCHEMA PUBLIC TO fmconcept"
 
 postgres.stop:
 	docker stop fmconcept-postgres

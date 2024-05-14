@@ -14,7 +14,9 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/rand_manager"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/shopspring/decimal"
 )
 
 type Auth interface {
@@ -28,16 +30,21 @@ type Auth interface {
 	DropExpiredTokens(ctx context.Context) error
 }
 
+type Client interface {
+	FixingPurchaseDataSet(ctx context.Context, tx repository.Transaction, from common.Address, value decimal.Decimal) error
+}
+
 type EthTransactions interface {
 	getTxLogs(ctx context.Context, hash string) ([]*types.Log, error)
 }
 
 type Listener interface {
-	listenBlockchain() error
+	listenBlockchain(ctx context.Context) error
 }
 
 type Service interface {
 	Auth
+	Client
 	Listener
 	EthTransactions
 
@@ -46,6 +53,7 @@ type Service interface {
 
 type service struct {
 	Auth
+	Client
 	Listener
 	EthTransactions
 
@@ -76,14 +84,16 @@ func NewService(
 
 		Auth = NewAuthService(cfg, repo.Users, repo.JWTokens, repo.Transactions, jwtTokenManager,
 			hashManager, timeManager, randManager, logging)
+		Client          = NewClientService(cfg, repo.Users, repo.Transactions, timeManager, logging)
 		EthTransactions = NewEthTransactionsService(ethClient, logging)
 
-		listener = NewListenerService(cfg, repo.BlockCounterRepo, repo.Transactions, repo.EthTransactions,
+		listener = NewListenerService(cfg, repo.BlockCounterRepo, repo.Transactions, repo.EthTransactions, Client,
 			ethClient, logging, stopCh)
 	)
 
 	res := &service{
 		Auth:            Auth,
+		Client:          Client,
 		Listener:        listener,
 		EthTransactions: EthTransactions,
 
@@ -95,7 +105,7 @@ func NewService(
 	}
 	res.ctxBackground, res.cancelCtx = context.WithCancel(context.Background())
 
-	if err := listener.listenBlockchain(); err != nil {
+	if err := listener.listenBlockchain(res.ctxBackground); err != nil {
 		return nil, err
 	}
 

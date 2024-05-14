@@ -36,6 +36,7 @@ CREATE TABLE public.clients
 (
     id  BIGSERIAL PRIMARY KEY,
     agreement BOOLEAN NOT NULL,
+    bought BOOLEAN NOT NULL,
     point_balance VARCHAR(255) NOT NULL DEFAULT '0'
 );
 

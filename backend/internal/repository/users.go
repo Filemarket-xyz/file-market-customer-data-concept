@@ -34,9 +34,9 @@ func (r *UsersRepo) InsertClient(ctx context.Context, transaction Transaction, c
 		return 0, errors.New("InsertClient: error: type assertion failed on interface Transaction")
 	}
 
-	row := tx.QueryRow(ctx, `INSERT INTO clients (id, agreement, point_balance) 
-		VALUES (DEFAULT, $1,$2) RETURNING id`,
-		c.Agreement, c.PointBalance.String())
+	row := tx.QueryRow(ctx, `INSERT INTO clients (id, agreement, bought, point_balance) 
+		VALUES (DEFAULT, $1,$2,$3) RETURNING id`,
+		c.Agreement, c.Bought, c.PointBalance.String())
 	var id int64
 	if err := row.Scan(&id); err != nil {
 		return 0, fmt.Errorf("InsertClient/Scan: %w", err)
@@ -55,9 +55,21 @@ func (r *UsersRepo) UpdateClient(ctx context.Context, transaction Transaction, c
 	if !ok {
 		return errors.New("UpdateClient: error: type assertion failed on interface Transaction")
 	}
-	if _, err := tx.Exec(ctx, `UPDATE clients SET agreement=$1, point_balance=$2 WHERE id=$3`,
-		c.Agreement, c.PointBalance.String(), c.Id); err != nil {
+	if _, err := tx.Exec(ctx, `UPDATE clients SET agreement=$1, bought=$2, point_balance=$3 WHERE id=$4`,
+		c.Agreement, c.Bought, c.PointBalance.String(), c.Id); err != nil {
 		return fmt.Errorf("UpdateClient/Exec: %w", err)
+	}
+	return nil
+}
+
+func (r *UsersRepo) UpdateDatasetPurchaseData(ctx context.Context, transaction Transaction, val bool, id int64) error {
+	tx, ok := transaction.(pgx.Tx)
+	if !ok {
+		return errors.New("UpdateDatasetPurchaseData: error: type assertion failed on interface Transaction")
+	}
+	if _, err := tx.Exec(ctx, `UPDATE clients SET bought=$1 WHERE id=$2`,
+		val, id); err != nil {
+		return fmt.Errorf("UpdateDatasetPurchaseData/Exec: %w", err)
 	}
 	return nil
 }
@@ -68,7 +80,7 @@ func (r *UsersRepo) GetClientById(ctx context.Context, transaction Transaction, 
 		return nil, errors.New("GetClientById: error: type assertion failed on interface Transaction")
 	}
 
-	row := tx.QueryRow(ctx, `SELECT c.id, u.address, c.agreement, c.point_balance
+	row := tx.QueryRow(ctx, `SELECT c.id, u.address, c.agreement, c.bought, c.point_balance
 		FROM clients AS c 
 		JOIN users AS u ON u.id = c.id AND c.id=$1
 	`, id)
@@ -77,7 +89,7 @@ func (r *UsersRepo) GetClientById(ctx context.Context, transaction Transaction, 
 		c    = &domain.Client{}
 		addr string
 	)
-	err := row.Scan(&c.Id, &addr, &c.Agreement, &c.PointBalance)
+	err := row.Scan(&c.Id, &addr, &c.Agreement, &c.Bought, &c.PointBalance)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrNoRows

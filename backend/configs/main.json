@@ -13,6 +13,8 @@
     "mode": "dev",
     "accessTTL": "30m",
     "refreshTTL": "24h",
+    "walletAddress": "",
+    "datasetCost": "1000000000000000000",
     "periods": {
       "listener": "500ms",
       "jwtCheckPeriod": "2s"

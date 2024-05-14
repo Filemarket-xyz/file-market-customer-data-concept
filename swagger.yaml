@@ -199,11 +199,22 @@ definitions:
   Client:
     type: object
     description: Клиент
+    required:
+      - agreement
     properties:
       id:
         type: integer
         format: int64
         readOnly: true
+      agreement:
+        type: boolean
+        description: Согласие на предоставление датасета
+      bought:
+        type: boolean
+        description: Осуществление покупки
+      point_balance:
+        type: string
+
   Transaction:
     description: Данные транзакции
     type: object

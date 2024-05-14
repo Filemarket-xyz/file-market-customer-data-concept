@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/shopspring/decimal"
 	"github.com/spf13/viper"
 )
 
@@ -58,6 +59,7 @@ type (
 		RpcUrl            string
 		Mode              string
 		Wallet            common.Address
+		DatasetCost       decimal.Decimal
 		Periods           *Periods
 	}
 
@@ -90,6 +92,12 @@ func Init(configPath string) (*Config, error) {
 	walletAddress := jsonCfg.GetString("service.walletAddress")
 	wallet := common.HexToAddress(walletAddress)
 
+	datasetCostStr := jsonCfg.GetString("service.datasetCost")
+	datasetCost, err := decimal.NewFromString(datasetCostStr)
+	if err != nil {
+		return nil, fmt.Errorf("config/Init/decimal.NewFromString: %w", err)
+	}
+
 	return &Config{
 		Locale: jsonCfg.GetInt64("locale"),
 		Server: &ServerConfig{
@@ -114,7 +122,8 @@ func Init(configPath string) (*Config, error) {
 				ListenerPeriod: jsonCfg.GetDuration("service.periods.listener"),
 				JwtCheckPeriod: jsonCfg.GetDuration("service.periods.jwtCheckPeriod"),
 			},
-			Wallet: wallet,
+			Wallet:      wallet,
+			DatasetCost: datasetCost,
 		},
 		Redis: &RedisConfig{
 			Host:          envCfg.GetString("REDIS_HOST"),

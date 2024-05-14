@@ -88,7 +88,9 @@ func (s *AuthService) getAuthRespByIdAndRole(
 	role domain.Role,
 ) (*models.AuthResponse, error) {
 	var (
-		resp models.AuthResponse
+		resp = models.AuthResponse{
+			User: &models.UserResponse{},
+		}
 	)
 	switch role {
 	case domain.RoleClient:

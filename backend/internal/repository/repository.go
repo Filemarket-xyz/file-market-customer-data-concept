@@ -17,6 +17,7 @@ var ErrNoRows = pgx.ErrNoRows
 type Users interface {
 	InsertClient(ctx context.Context, tx Transaction, c *domain.Client) (int64, error)
 	UpdateClient(ctx context.Context, tx Transaction, c *domain.Client) error
+	UpdateDatasetPurchaseData(ctx context.Context, transaction Transaction, val bool, id int64) error
 	GetClientById(ctx context.Context, tx Transaction, id int64) (*domain.Client, error)
 	GetUserIdByAddress(ctx context.Context, tx Transaction, addr string) (int64, domain.Role, error)
 
