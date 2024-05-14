@@ -31,6 +31,7 @@ type Auth interface {
 }
 
 type Client interface {
+	UpdateClientAgreement(ctx context.Context, clientId int64, agreement bool) (*models.Client, error)
 	GetUserDataset(ctx context.Context, user *domain.UserWithTokenNumber) ([][]string, error)
 	FixingPurchaseDataSet(ctx context.Context, tx repository.Transaction, from common.Address, value decimal.Decimal) error
 }

@@ -178,7 +178,7 @@ func setCookies(w http.ResponseWriter, tokens *domain.PairOfTokens) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     domain.RefreshTokenCookieName,
 		Value:    tokens.RefreshToken.Token,
-		Path:     "/api/auth/refresh",
+		Path:     "/auth/refresh",
 		Expires:  tokens.RefreshToken.ExpiresAt,
 		Secure:   true,
 		HttpOnly: true,

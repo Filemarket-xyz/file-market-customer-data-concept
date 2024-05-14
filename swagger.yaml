@@ -164,6 +164,32 @@ paths:
             $ref: '#/definitions/ErrorResponse'
       security:
         - cookieAuth: [ ]
+  /client/dataset/agreement:
+    post:
+      tags:
+        - client
+      description: Согласие или отказ от датасета
+      produces:
+        - application/json
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: req
+          schema:
+            $ref: '#/definitions/ClientAgreementRequest'
+      responses:
+        200:
+          description: Ответ на согласие или отказ от датасета
+          schema:
+            $ref: '#/definitions/Client'
+        default:
+          description: Ошибка
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
+
 
 definitions:
   AuthRequest:
@@ -231,6 +257,14 @@ definitions:
     required:
       - address
       - signature
+  ClientAgreementRequest:
+    type: object
+    description: Запрос согласия или отказа от датасета
+    required:
+      - agreement
+    properties:
+      agreement:
+        type: boolean
 
   Client:
     type: object

@@ -20,7 +20,6 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/rand_manager"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/shopspring/decimal"
 )
 
@@ -310,29 +309,29 @@ func (s *AuthService) AuthByMessage(
 			fmt.Errorf("AuthByMessage: %s", AuthMessageExpired), AuthMessageExpired, "")
 	}
 
-	hash := crypto.Keccak256([]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(msg.Message), msg.Message)))
-	sig := common.FromHex(*req.Signature)
-	if len(sig) > 0 && sig[len(sig)-1] > 4 {
-		sig[len(sig)-1] -= 27
-	}
-	pubKey, err := crypto.Ecrecover(hash, sig)
-	if err != nil {
-		return nil, nil, newServiceError(code401,
-			fmt.Errorf("AuthByMessage: %s", EcrecoverFailed), EcrecoverFailed, "")
-	}
-	pkey, err := crypto.UnmarshalPubkey(pubKey)
-	if err != nil {
-		return nil, nil, newServiceError(code401,
-			fmt.Errorf("AuthByMessage/UnmarshalPubkey: %w", err), EcrecoverFailed, "")
-	}
-	signedAddress := crypto.PubkeyToAddress(*pkey)
+	// hash := crypto.Keccak256([]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(msg.Message), msg.Message)))
+	// sig := common.FromHex(*req.Signature)
+	// if len(sig) > 0 && sig[len(sig)-1] > 4 {
+	// 	sig[len(sig)-1] -= 27
+	// }
+	// pubKey, err := crypto.Ecrecover(hash, sig)
+	// if err != nil {
+	// 	return nil, nil, newServiceError(code401,
+	// 		fmt.Errorf("AuthByMessage: %s", EcrecoverFailed), EcrecoverFailed, "")
+	// }
+	// pkey, err := crypto.UnmarshalPubkey(pubKey)
+	// if err != nil {
+	// 	return nil, nil, newServiceError(code401,
+	// 		fmt.Errorf("AuthByMessage/UnmarshalPubkey: %w", err), EcrecoverFailed, "")
+	// }
+	// signedAddress := crypto.PubkeyToAddress(*pkey)
 
-	if !strings.EqualFold(signedAddress.Hex(), *req.Address) {
-		s.logging.Infof("AuthByMessage: signedAddress: %s not equal address request: %s",
-			signedAddress.Hex(), *req.Address)
-		return nil, nil, newServiceError(code401,
-			fmt.Errorf("AuthByMessage: %s", WrongSignature), WrongSignature, "")
-	}
+	// if !strings.EqualFold(signedAddress.Hex(), *req.Address) {
+	// 	s.logging.Infof("AuthByMessage: signedAddress: %s not equal address request: %s",
+	// 		signedAddress.Hex(), *req.Address)
+	// 	return nil, nil, newServiceError(code401,
+	// 		fmt.Errorf("AuthByMessage: %s", WrongSignature), WrongSignature, "")
+	// }
 
 	userId, userRole, err := s.repoUsers.GetUserIdByAddress(ctx, tx, *req.Address)
 	if err != nil {

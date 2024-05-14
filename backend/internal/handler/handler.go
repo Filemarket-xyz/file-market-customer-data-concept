@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/config"
+	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/domain"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/service"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
 	"github.com/go-openapi/strfmt"
@@ -56,7 +57,8 @@ func (h *handler) Init() http.Handler {
 	authRouter.HandleFunc("/by_signature", h.AuthByMessage)
 
 	clientRouter := router.PathPrefix("/client").Subrouter()
-	clientRouter.Handle("/dataset/download", h.CookieAuthMiddleware((http.HandlerFunc(h.DownloadDataset))))
+	clientRouter.Handle("/dataset/download", h.CookieAuthMiddleware(h.permissionMiddleware(domain.RoleClient)((http.HandlerFunc(h.DownloadDataset)))))
+	clientRouter.Handle("/dataset/agreement", h.CookieAuthMiddleware(h.permissionMiddleware(domain.RoleClient)((http.HandlerFunc(h.AgreementDataset)))))
 
 	router.Use(h.corsMiddleware)
 	return router

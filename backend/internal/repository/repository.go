@@ -28,6 +28,7 @@ type Users interface {
 
 type Datasets interface {
 	GetDatasetsByClientId(ctx context.Context, tx Transaction, id int64) ([]*domain.Dataset, error)
+	DeleteByClientId(ctx context.Context, tx Transaction, id int64) error
 }
 
 type BlockCounterRepo interface {

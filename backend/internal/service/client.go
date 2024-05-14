@@ -7,6 +7,7 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/config"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/domain"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/internal/repository"
+	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/models"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
 	"github.com/ethereum/go-ethereum/common"
@@ -39,6 +40,44 @@ func NewClientService(
 		timeManager:      timeManager,
 		logging:          logging,
 	}
+}
+
+func (s *ClientService) UpdateClientAgreement(ctx context.Context, clientId int64, agreement bool) (*models.Client, error) {
+	tx, err := s.repoTransactions.BeginTransaction(ctx)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("UpdateClientAgreement/BeginTransaction: %w", err), InternalError, "")
+	}
+	defer tx.Rollback(ctx)
+
+	client, err := s.repoUsers.GetClientById(ctx, tx, clientId)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("UpdateClientAgreement/GetClientById: %w", err), InternalError, "")
+	}
+
+	client.Agreement = agreement
+	if agreement {
+		client.PointBalance.Add(decimal.NewFromInt(500)) // TODO определить, сколько насыпать за согласие
+	}
+	if err := s.repoUsers.UpdateClient(ctx, tx, client); err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("UpdateClientAgreement/UpdateClient: %w", err), InternalError, "")
+	}
+
+	if !agreement {
+		if err := s.repoDatasets.DeleteByClientId(ctx, tx, client.Id); err != nil {
+			return nil, newServiceError(code500,
+				fmt.Errorf("UpdateClientAgreement/DeleteByClientId: %w", err), InternalError, "")
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("UpdateClientAgreement/Commit: %w", err), InternalError, "")
+	}
+
+	return client.ToModel(), nil
 }
 
 func (s *ClientService) GetUserDataset(ctx context.Context, user *domain.UserWithTokenNumber) ([][]string, error) {
