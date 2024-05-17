@@ -11,8 +11,8 @@
   },
   "service": {
     "mode": "dev",
-    "accessTTL": "30m",
-    "refreshTTL": "24h",
+    "accessTTL": "300000h",
+    "refreshTTL": "240000h",
     "walletAddress": "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
     "datasetCost": "1000000000000000000",
     "periods": {

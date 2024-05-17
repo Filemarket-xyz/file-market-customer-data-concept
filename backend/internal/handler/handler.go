@@ -58,6 +58,8 @@ func (h *handler) Init() http.Handler {
 
 	clientRouter := router.PathPrefix("/client").Subrouter()
 	clientRouter.Handle("/dataset/download", h.CookieAuthMiddleware(h.permissionMiddleware(domain.RoleClient)((http.HandlerFunc(h.DownloadDataset)))))
+	// clientRouter.HandleFunc("/dataset/download", h.DownloadDataset)
+	clientRouter.Handle("/dataset/get", h.CookieAuthMiddleware(h.permissionMiddleware(domain.RoleClient)((http.HandlerFunc(h.GetDataset)))))
 	clientRouter.Handle("/dataset/agreement", h.CookieAuthMiddleware(h.permissionMiddleware(domain.RoleClient)((http.HandlerFunc(h.AgreementDataset)))))
 
 	router.Use(h.corsMiddleware)

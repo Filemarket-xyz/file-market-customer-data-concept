@@ -164,6 +164,24 @@ paths:
             $ref: '#/definitions/ErrorResponse'
       security:
         - cookieAuth: [ ]
+  /client/dataset/get:
+    get:
+      tags:
+        - client
+      description: получить датасет клиента, ориентироваться по полю dataset в структуре Client. показывать, какая у нас есть инфа
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Ответ на согласие или отказ от датасета
+          schema:
+            $ref: '#/definitions/GetClientDatasetResponse'
+        default:
+          description: Ошибка
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      security:
+        - cookieAuth: [ ]
   /client/dataset/agreement:
     post:
       tags:
@@ -265,6 +283,25 @@ definitions:
     properties:
       agreement:
         type: boolean
+  GetClientDatasetResponse:
+    type: object
+    properties:
+      dataset:
+        type: array
+        items:
+          $ref: '#/definitions/Dataset'
+
+
+  Dataset:
+    type: object
+    description: датасет
+    properties:
+      name:
+        type: string
+      data:
+        type: string
+      desc:
+        type: string
 
   Client:
     type: object
@@ -279,6 +316,9 @@ definitions:
       agreement:
         type: boolean
         description: Согласие на предоставление датасета
+      dataset:
+        type: boolean
+        description: Наличие датасета
       bought:
         type: boolean
         description: Осуществление покупки

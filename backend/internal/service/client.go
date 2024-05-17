@@ -56,20 +56,25 @@ func (s *ClientService) UpdateClientAgreement(ctx context.Context, clientId int6
 			fmt.Errorf("UpdateClientAgreement/GetClientById: %w", err), InternalError, "")
 	}
 
-	client.Agreement = agreement
-	if agreement {
-		client.PointBalance.Add(decimal.NewFromInt(500)) // TODO определить, сколько насыпать за согласие
-	}
-	if err := s.repoUsers.UpdateClient(ctx, tx, client); err != nil {
-		return nil, newServiceError(code500,
-			fmt.Errorf("UpdateClientAgreement/UpdateClient: %w", err), InternalError, "")
+	if client.Agreement {
+		return nil, newServiceError(code400,
+			fmt.Errorf("UpdateClientAgreement: there is already agreement"), "there is already agreement", "")
 	}
 
+	client.Agreement = agreement
+	if agreement {
+		client.PointBalance = client.PointBalance.Add(decimal.NewFromInt(500)) // TODO определить, сколько насыпать за согласие
+	}
 	if !agreement {
+		client.Dataset = false
 		if err := s.repoDatasets.DeleteByClientId(ctx, tx, client.Id); err != nil {
 			return nil, newServiceError(code500,
 				fmt.Errorf("UpdateClientAgreement/DeleteByClientId: %w", err), InternalError, "")
 		}
+	}
+	if err := s.repoUsers.UpdateClient(ctx, tx, client); err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("UpdateClientAgreement/UpdateClient: %w", err), InternalError, "")
 	}
 
 	if err := tx.Commit(ctx); err != nil {
@@ -104,7 +109,7 @@ func (s *ClientService) GetUserDataset(ctx context.Context, user *domain.UserWit
 			fmt.Errorf("GetUserDataset: client did not pay"), "The client did not pay for the data set", "")
 	}
 
-	datasets, err := s.repoDatasets.GetDatasetsByClientId(ctx, tx, user.Id)
+	dataset, err := s.repoDatasets.GetDatasetsByClientId(ctx, tx, user.Id)
 	if err != nil {
 		return nil, newServiceError(code500,
 			fmt.Errorf("GetUserDataset/GetClientById: %w", err), InternalError, "")
@@ -115,10 +120,46 @@ func (s *ClientService) GetUserDataset(ctx context.Context, user *domain.UserWit
 			fmt.Errorf("GetUserDataset/Commit: %w", err), InternalError, "")
 	}
 
-	res, err := domain.DatasetsToStrings(datasets)
+	res, err := domain.SliceDataToStrings([]*domain.Dataset{dataset})
 	if err != nil {
 		return nil, newServiceError(code500,
 			fmt.Errorf("GetUserDataset/DatasetsToStrings: %w", err), InternalError, "")
+	}
+
+	return res, nil
+}
+
+func (s *ClientService) GetDataset(ctx context.Context, clientId int64) (*models.GetClientDatasetResponse, error) {
+	tx, err := s.repoTransactions.BeginTransaction(ctx)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetDataset/BeginTransaction: %w", err), InternalError, "")
+	}
+	defer tx.Rollback(ctx)
+
+	client, err := s.repoUsers.GetClientById(ctx, tx, clientId)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetDataset/GetClientById: %w", err), InternalError, "")
+	}
+	if !client.Dataset {
+		return nil, newServiceError(code400,
+			fmt.Errorf("GetDataset: the client does not have a dataset"), "the client does not have a dataset", "")
+	}
+
+	dataset, err := s.repoDatasets.GetDatasetsByClientId(ctx, tx, client.Id)
+	if err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetDataset/GetClientById: %w", err), InternalError, "")
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, newServiceError(code500,
+			fmt.Errorf("GetDataset/Commit: %w", err), InternalError, "")
+	}
+
+	res := &models.GetClientDatasetResponse{
+		Dataset: dataset.ToModel(),
 	}
 
 	return res, nil

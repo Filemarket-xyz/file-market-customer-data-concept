@@ -12,6 +12,7 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/hash"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/jwtoken"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
+	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/providers/dune"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/rand_manager"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
 	"github.com/ethereum/go-ethereum/common"
@@ -33,7 +34,12 @@ type Auth interface {
 type Client interface {
 	UpdateClientAgreement(ctx context.Context, clientId int64, agreement bool) (*models.Client, error)
 	GetUserDataset(ctx context.Context, user *domain.UserWithTokenNumber) ([][]string, error)
+	GetDataset(ctx context.Context, clientId int64) (*models.GetClientDatasetResponse, error)
 	FixingPurchaseDataSet(ctx context.Context, tx repository.Transaction, from common.Address, value decimal.Decimal) error
+}
+
+type Dataset interface {
+	UploadDatasetsByAddress(clientId int64, address common.Address)
 }
 
 type Config interface {
@@ -52,6 +58,7 @@ type Service interface {
 	Auth
 	Client
 	Config
+	Dataset
 	Listener
 	EthTransactions
 
@@ -62,6 +69,7 @@ type service struct {
 	Auth
 	Client
 	Config
+	Dataset
 	Listener
 	EthTransactions
 
@@ -83,15 +91,20 @@ func NewService(
 	hashManager hash.HashManager,
 	timeManager time_manager.TimeManager,
 	randManager rand_manager.RandManager,
+
+	duneProvider dune.Dune,
 	cfg *config.ServiceConfig,
 	logging logger.Logger,
 ) (Service, error) {
 
 	var (
+		ctxBackground, cancelCtx = context.WithCancel(context.Background())
+
 		stopCh = make(chan struct{})
 
-		Auth = NewAuthService(cfg, repo.Users, repo.JWTokens, repo.Transactions, jwtTokenManager,
-			hashManager, timeManager, randManager, logging)
+		Dataset = NewDatasetsService(ctxBackground, repo.Users, repo.Datasets, repo.Transactions, duneProvider, logging)
+		Auth    = NewAuthService(cfg, repo.Users, repo.JWTokens, repo.Transactions, Dataset,
+			jwtTokenManager, hashManager, timeManager, randManager, logging)
 		Config          = NewConfigService(cfg, logging)
 		Client          = NewClientService(cfg, repo.Users, repo.Datasets, repo.Transactions, timeManager, logging)
 		EthTransactions = NewEthTransactionsService(ethClient, logging)
@@ -104,16 +117,18 @@ func NewService(
 		Auth:            Auth,
 		Client:          Client,
 		Config:          Config,
+		Dataset:         Dataset,
 		Listener:        listener,
 		EthTransactions: EthTransactions,
 
 		ethClient: ethClient,
 
-		cfg:     cfg,
-		logging: logging,
-		stopCh:  stopCh,
+		cfg:           cfg,
+		logging:       logging,
+		stopCh:        stopCh,
+		ctxBackground: ctxBackground,
+		cancelCtx:     cancelCtx,
 	}
-	res.ctxBackground, res.cancelCtx = context.WithCancel(context.Background())
 
 	if err := listener.listenBlockchain(res.ctxBackground); err != nil {
 		return nil, err

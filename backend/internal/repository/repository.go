@@ -27,8 +27,13 @@ type Users interface {
 }
 
 type Datasets interface {
-	GetDatasetsByClientId(ctx context.Context, tx Transaction, id int64) ([]*domain.Dataset, error)
+	GetDatasetsByClientId(ctx context.Context, tx Transaction, id int64) (*domain.Dataset, error)
 	DeleteByClientId(ctx context.Context, tx Transaction, id int64) error
+
+	AddMultiChainBalancesDataset(ctx context.Context, transaction Transaction, clientId int64, d *domain.MultiChainBalancesDataset) error
+	AddLayerZeroUserFees(ctx context.Context, tx Transaction, clientId int64, d *domain.LayerZeroUserFeesDataset) error
+	AddRankLayerZeroUser(ctx context.Context, transaction Transaction, clientId int64, d *domain.RankLZDataset) error
+	AddZkSyncEraUserStat(ctx context.Context, transaction Transaction, clientId int64, d *domain.ZkSyncEraUserStatDataset) error
 }
 
 type BlockCounterRepo interface {

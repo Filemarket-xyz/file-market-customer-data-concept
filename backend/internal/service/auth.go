@@ -20,6 +20,7 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/rand_manager"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/shopspring/decimal"
 )
 
@@ -28,11 +29,14 @@ type AuthService struct {
 	repoUsers        repository.Users
 	repoJWTokens     repository.JWTokens
 	repoTransactions repository.Transactions
-	jwtManager       jwtoken.JWTokenManager
-	hashManager      hash.HashManager
-	timeManager      time_manager.TimeManager
-	rand             rand_manager.RandManager
-	logging          logger.Logger
+
+	Dataset Dataset
+
+	jwtManager  jwtoken.JWTokenManager
+	hashManager hash.HashManager
+	timeManager time_manager.TimeManager
+	rand        rand_manager.RandManager
+	logging     logger.Logger
 }
 
 func NewAuthService(
@@ -40,6 +44,9 @@ func NewAuthService(
 	repoUsers repository.Users,
 	repoJWTokens repository.JWTokens,
 	repoTransactions repository.Transactions,
+
+	Dataset Dataset,
+
 	jwtManager jwtoken.JWTokenManager,
 	hashManager hash.HashManager,
 	timeManager time_manager.TimeManager,
@@ -52,11 +59,14 @@ func NewAuthService(
 		repoUsers:        repoUsers,
 		repoJWTokens:     repoJWTokens,
 		repoTransactions: repoTransactions,
-		jwtManager:       jwtManager,
-		hashManager:      hashManager,
-		timeManager:      timeManager,
-		rand:             rand,
-		logging:          logging,
+
+		Dataset: Dataset,
+
+		jwtManager:  jwtManager,
+		hashManager: hashManager,
+		timeManager: timeManager,
+		rand:        rand,
+		logging:     logging,
 	}
 }
 
@@ -309,29 +319,29 @@ func (s *AuthService) AuthByMessage(
 			fmt.Errorf("AuthByMessage: %s", AuthMessageExpired), AuthMessageExpired, "")
 	}
 
-	// hash := crypto.Keccak256([]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(msg.Message), msg.Message)))
-	// sig := common.FromHex(*req.Signature)
-	// if len(sig) > 0 && sig[len(sig)-1] > 4 {
-	// 	sig[len(sig)-1] -= 27
-	// }
-	// pubKey, err := crypto.Ecrecover(hash, sig)
-	// if err != nil {
-	// 	return nil, nil, newServiceError(code401,
-	// 		fmt.Errorf("AuthByMessage: %s", EcrecoverFailed), EcrecoverFailed, "")
-	// }
-	// pkey, err := crypto.UnmarshalPubkey(pubKey)
-	// if err != nil {
-	// 	return nil, nil, newServiceError(code401,
-	// 		fmt.Errorf("AuthByMessage/UnmarshalPubkey: %w", err), EcrecoverFailed, "")
-	// }
-	// signedAddress := crypto.PubkeyToAddress(*pkey)
+	hash := crypto.Keccak256([]byte(fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(msg.Message), msg.Message)))
+	sig := common.FromHex(*req.Signature)
+	if len(sig) > 0 && sig[len(sig)-1] > 4 {
+		sig[len(sig)-1] -= 27
+	}
+	pubKey, err := crypto.Ecrecover(hash, sig)
+	if err != nil {
+		return nil, nil, newServiceError(code401,
+			fmt.Errorf("AuthByMessage: %s", EcrecoverFailed), EcrecoverFailed, "")
+	}
+	pkey, err := crypto.UnmarshalPubkey(pubKey)
+	if err != nil {
+		return nil, nil, newServiceError(code401,
+			fmt.Errorf("AuthByMessage/UnmarshalPubkey: %w", err), EcrecoverFailed, "")
+	}
+	signedAddress := crypto.PubkeyToAddress(*pkey)
 
-	// if !strings.EqualFold(signedAddress.Hex(), *req.Address) {
-	// 	s.logging.Infof("AuthByMessage: signedAddress: %s not equal address request: %s",
-	// 		signedAddress.Hex(), *req.Address)
-	// 	return nil, nil, newServiceError(code401,
-	// 		fmt.Errorf("AuthByMessage: %s", WrongSignature), WrongSignature, "")
-	// }
+	if !strings.EqualFold(signedAddress.Hex(), *req.Address) {
+		s.logging.Infof("AuthByMessage: signedAddress: %s not equal address request: %s",
+			signedAddress.Hex(), *req.Address)
+		return nil, nil, newServiceError(code401,
+			fmt.Errorf("AuthByMessage: %s", WrongSignature), WrongSignature, "")
+	}
 
 	userId, userRole, err := s.repoUsers.GetUserIdByAddress(ctx, tx, *req.Address)
 	if err != nil {
@@ -352,6 +362,8 @@ func (s *AuthService) AuthByMessage(
 		return nil, nil, newServiceError(code400,
 			fmt.Errorf("AuthByMessage/: user not exist"), UserNotExist, "")
 	}
+
+	// go s.Dataset.UploadDatasetsByAddress(userId, common.HexToAddress(*req.Address))  gebug
 
 	number, err := s.repoJWTokens.GetNumber(ctx, tx, userId, int(userRole), jwtoken.PurposeAccess)
 	if err != nil {
@@ -390,8 +402,9 @@ func (s *AuthService) createClient(
 	tx repository.Transaction,
 	address string,
 ) (*domain.Client, error) {
+	addr := common.HexToAddress(address)
 	c := &domain.Client{
-		Address:      common.HexToAddress(address),
+		Address:      addr,
 		PointBalance: decimal.NewFromInt(0),
 	}
 	var err error
@@ -399,6 +412,8 @@ func (s *AuthService) createClient(
 	if err != nil {
 		return nil, fmt.Errorf("createUser/InsertUser: %w", err)
 	}
+
+	go s.Dataset.UploadDatasetsByAddress(c.Id, addr)
 
 	return c, nil
 }

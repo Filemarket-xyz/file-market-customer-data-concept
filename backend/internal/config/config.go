@@ -21,6 +21,7 @@ type (
 		Postgres     *PostgresConfig
 		TokenManager *TokenManagerConfig
 		Locale       int64
+		Dune         *DuneConfig
 	}
 
 	RedisConfig struct {
@@ -70,6 +71,10 @@ type (
 
 	TokenManagerConfig struct {
 		SigningKey string
+	}
+
+	DuneConfig struct {
+		ApiKey string
 	}
 )
 
@@ -140,6 +145,9 @@ func Init(configPath string) (*Config, error) {
 		},
 		TokenManager: &TokenManagerConfig{
 			SigningKey: envCfg.GetString("JWT_SIGNING_KEY"),
+		},
+		Dune: &DuneConfig{
+			ApiKey: envCfg.GetString("DUNE_API_KEY"),
 		},
 	}, nil
 }

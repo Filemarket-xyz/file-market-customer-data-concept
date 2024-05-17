@@ -21,6 +21,7 @@ import (
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/hash"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/jwtoken"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/logger"
+	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/providers/dune"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/rand_manager"
 	"github.com/Filemarket-xyz/file-market-customer-data-concept/backend/pkg/time_manager"
 	rpc2 "github.com/ethereum/go-ethereum/rpc"
@@ -61,12 +62,14 @@ func main() {
 	timeManager := time_manager.New(cfg.Locale)
 	randManager := rand_manager.NewRandManager(time.Now().UnixNano())
 
+	duneProvider := dune.NewDune(cfg.Dune, logging)
+
 	repo, err := repository.NewRepository(cfg, redis, pool)
 	if err != nil {
 		logging.Panic(err)
 	}
 
-	service, err := service.NewService(ctx, repo, ethClient, jwtokenManager, hash.NewHashManager(), timeManager, randManager, cfg.Service, logging)
+	service, err := service.NewService(ctx, repo, ethClient, jwtokenManager, hash.NewHashManager(), timeManager, randManager, duneProvider, cfg.Service, logging)
 	if err != nil {
 		logging.Panic(err)
 	}

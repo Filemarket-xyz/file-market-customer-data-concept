@@ -22,6 +22,10 @@ func (h *handler) DownloadDataset(w http.ResponseWriter, r *http.Request) {
 		h.makeErrorResponse(w, r, errors.New("DownloadDataset"), code500)
 		return
 	}
+	// user := &domain.UserWithTokenNumber{
+	// 	Id: 4,
+	// 	Role: domain.RoleClient,
+	// }
 
 	datasets, err := h.service.GetUserDataset(ctx, user)
 	if err != nil {
@@ -36,6 +40,29 @@ func (h *handler) DownloadDataset(w http.ResponseWriter, r *http.Request) {
 	wr := csv.NewWriter(w)
 	// Write all items and deal with errors
 	if err := wr.WriteAll(datasets); err != nil {
+		h.makeErrorResponse(w, r, err, code500)
+		return
+	}
+}
+
+func (h *handler) GetDataset(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+
+	ctx, cancel := context.WithTimeout(r.Context(), h.cfg.RequestTimeout)
+	defer cancel()
+
+	user, ok := ctx.Value(CtxKeyUser).(*domain.UserWithTokenNumber)
+	if !ok {
+		h.makeErrorResponse(w, r, errors.New("GetDataset"), code500)
+		return
+	}
+
+	res, err := h.service.GetDataset(ctx, user.Id)
+	if err != nil {
+		h.makeErrorResponse(w, r, err, code500)
+		return
+	}
+	if err := writeResponse(w, r, http.StatusOK, res); err != nil {
 		h.makeErrorResponse(w, r, err, code500)
 		return
 	}
