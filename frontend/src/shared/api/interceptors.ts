@@ -4,7 +4,7 @@ import { NavigateFunction } from 'react-router'
 
 import { AuthResponse, ErrorResponse, HttpResponse } from '~/swagger/Api'
 
-import { RequestMultiplex, stringifyError, to } from '../lib'
+import { RequestMultiplex, stringifyError, stringifyWeb3Error, to } from '../lib'
 import { api } from './api'
 
 const refreshMultiplex = new RequestMultiplex<HttpResponse<AuthResponse, ErrorResponse>>()
@@ -22,7 +22,9 @@ export const refreshCookies = async (navigate: NavigateFunction): Promise<boolea
 }
 
 const showError = (response: HttpResponse<unknown, ErrorResponse>) => {
-  return enqueueSnackbar(stringifyError(response.error), {
+  const message = 'error' in response ? stringifyError(response.error) : stringifyWeb3Error(response)
+
+  return enqueueSnackbar(message, {
     variant: 'error',
   })
 }
