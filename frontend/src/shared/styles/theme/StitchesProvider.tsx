@@ -1,5 +1,3 @@
-import 'reset-css'
-
 import { PropsWithChildren } from 'react'
 
 import { globalStyles } from './global'
