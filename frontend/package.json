@@ -12,14 +12,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@metamask/rpc-errors": "^6.2.1",
     "@stitches/react": "^1.2.8",
     "@tanstack/react-query": "^5.37.1",
     "notistack": "^3.0.1",
     "react": "^18.2.0",
+    "react-aria": "^3.33.1",
     "react-dom": "^18.2.0",
     "react-router": "^6.23.1",
     "react-router-dom": "^6.23.1",
-    "reset-css": "^5.0.2"
+    "stitches-reset": "^1.0.0",
+    "thirdweb": "^5.23.0",
+    "viem": "2.x",
+    "wagmi": "^2.9.6"
   },
   "devDependencies": {
     "@types/node": "^20.12.12",
