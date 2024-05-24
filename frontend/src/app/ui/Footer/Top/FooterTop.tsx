@@ -52,7 +52,7 @@ const columns: FooterLinkColumn[] = [
     links: [
       {
         children: 'Explore EFTs',
-        to: '/market',
+        href: 'https://filemarket.xyz/market',
       },
       {
         children: 'Build own Shop',
@@ -60,11 +60,11 @@ const columns: FooterLinkColumn[] = [
       },
       {
         children: 'Collections',
-        to: '/market/collections',
+        href: 'https://filemarket.xyz/market/collections',
       },
       {
         children: 'FileBunnies',
-        to: '/fileBunnies',
+        href: 'https://filemarket.xyz/fileBunnies',
       },
       {
         children: 'How to get FIL',
@@ -118,7 +118,7 @@ const columns: FooterLinkColumn[] = [
       },
       {
         children: 'Branding',
-        to: '/branding',
+        href: 'https://filemarket.xyz/branding',
       },
       {
         children: 'Calendly',
