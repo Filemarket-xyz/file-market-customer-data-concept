@@ -26,10 +26,20 @@ export const FooterBottom: React.FC = () => {
         </Txt>
         <StyledHr />
         <Flex gap="$3">
-          <Link size="small" color="gray300" href="/docs/PrivacyPolicy.docx">
+          <Link
+            download
+            size="small"
+            color="gray300"
+            href="/docs/PrivacyPolicy.docx"
+          >
             Privacy policy
           </Link>
-          <Link size="small" color="gray300" href="/docs/TermsOfService.docx">
+          <Link
+            download
+            size="small"
+            color="gray300"
+            href="/docs/TermsOfService.docx"
+          >
             Terms of Service
           </Link>
         </Flex>
