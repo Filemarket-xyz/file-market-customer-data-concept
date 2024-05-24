@@ -1,0 +1,49 @@
+{
+  "name": "vite-project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint --fix \"**/*.{ts,tsx}\"",
+    "swagger": "yarn swagger-typescript-api -p ../swagger.yaml -o ./src/swagger",
+    "prepare": "yarn swagger",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@metamask/rpc-errors": "^6.2.1",
+    "@stitches/react": "^1.2.8",
+    "@tanstack/react-query": "^5.37.1",
+    "notistack": "^3.0.1",
+    "react": "^18.2.0",
+    "react-aria": "^3.33.1",
+    "react-dom": "^18.2.0",
+    "react-router": "^6.23.1",
+    "react-router-dom": "^6.23.1",
+    "stitches-reset": "^1.0.0",
+    "thirdweb": "^5.23.0",
+    "viem": "2.x",
+    "wagmi": "^2.9.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "eslint-plugin-simple-import-sort": "^12.1.0",
+    "eslint-plugin-unused-imports": "^3.2.0",
+    "swagger-typescript-api": "^13.0.3",
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0",
+    "vite-plugin-svgr": "^4.2.0"
+  }
+}
