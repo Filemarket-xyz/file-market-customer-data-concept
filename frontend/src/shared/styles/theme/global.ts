@@ -1,5 +1,8 @@
-import { reset } from "stitches-reset"
+import { reset } from 'stitches-reset'
 
+import InterMediumTtf from '../fonts/Inter-Medium.ttf'
+import InterMediumWoff from '../fonts/Inter-Medium.woff'
+import InterMediumWoff2 from '../fonts/Inter-Medium.woff2'
 import InterRegularTtf from '../fonts/Inter-Regular.ttf'
 import InterRegularWoff from '../fonts/Inter-Regular.woff'
 import InterRegularWoff2 from '../fonts/Inter-Regular.woff2'
@@ -30,6 +33,15 @@ export const globalStyles = globalCss({
       src: `url('${InterRegularWoff2}') format('woff2'),
             url('${InterRegularWoff}') format('woff'),
             url('${InterRegularTtf}') format('truetype')`,
+      fontDisplay: 'swap',
+    },
+    {
+      fontFamily: 'Inter',
+      fontStyle: 'normal',
+      fontWeight: 500,
+      src: `url('${InterMediumWoff2}') format('woff2'),
+            url('${InterMediumWoff}') format('woff'),
+            url('${InterMediumTtf}') format('truetype')`,
       fontDisplay: 'swap',
     },
     {
@@ -97,7 +109,7 @@ export const globalStyles = globalCss({
     textDecoration: 'none',
     color: 'inherit',
   },
-  "*, *:before, *:after": {
+  '*, *:before, *:after': {
     boxSizing: 'border-box',
   },
 })
