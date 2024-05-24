@@ -1,4 +1,4 @@
-import { styled, Theme } from '~/shared/styles'
+import { AppCSS, styled, Theme, theme, ThemeColors } from '~/shared/styles'
 
 /**
  * works under condition, that config looks like this:
@@ -33,6 +33,11 @@ export const textVariant = (token: keyof Theme['fontSizes']) => ({
   },
 })
 
+const colorVariants = Object.entries(theme.colors).reduce((result, [key, value]) => ({
+  ...result,
+  [key]: { color: value },
+}), {} as Record<keyof ThemeColors, AppCSS>)
+
 export const Txt = styled('span', {
   color: 'inherit',
   variants: {
@@ -62,5 +67,9 @@ export const Txt = styled('span', {
     ternary1: textVariant('ternary1'),
     ternary2: textVariant('ternary2'),
     ternary3: textVariant('ternary3'),
+
+    color: {
+      ...colorVariants,
+    },
   },
 })

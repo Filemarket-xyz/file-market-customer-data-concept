@@ -15,7 +15,7 @@ export const Loading: React.FC<LoadingProps> = ({ loading, children, size = 24, 
         <Flex
           fullHeight
           fullWidth
-          justifyContent='center'
+          justifyContent="center"
           alignItems="center"
           css={{ minHeight: size }}
         >

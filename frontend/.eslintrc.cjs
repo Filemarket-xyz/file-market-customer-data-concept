@@ -68,7 +68,11 @@ module.exports = {
     '@typescript-eslint/keyword-spacing': 'error',
     '@typescript-eslint/space-before-blocks': 'error',
 
+    // jsx
+    'jsx-quotes': ['warn', 'prefer-double'],
+
     //react
+    'react/jsx-props-no-multi-spaces': 'warn',
     'react/display-name': 'off',
     'react/jsx-tag-spacing': 'error',
     'react/jsx-max-props-per-line': ['error', {
@@ -88,7 +92,7 @@ module.exports = {
     'react/jsx-indent': ['error', 2, {
       indentLogicalExpressions: true
     }],
-    'react/jsx-indent-props': ['error', 2, ],
+    'react/jsx-indent-props': ['error', 2],
     'react/jsx-closing-tag-location': 'error',
     'react/jsx-closing-bracket-location': 'error',
     'react/jsx-wrap-multilines': ['error', {
@@ -138,5 +142,6 @@ module.exports = {
     'eol-last': 'error',
     'arrow-spacing': 'error',
     'dot-notation': 'error',
+    'quotes': ['warn', 'single'],
   },
 }

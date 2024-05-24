@@ -3,7 +3,7 @@ import { AriaButtonProps, mergeProps, useButton as useButtonAria, useFocusRing, 
 
 import { useDOMRef } from '~/shared/lib'
 
-export const useButton = <Props extends AriaButtonProps & HTMLAttributes<HTMLSpanElement>, E extends HTMLElement>({
+export const useButton = <Props extends AriaButtonProps<'button'> & HTMLAttributes<HTMLSpanElement>, E extends HTMLElement>({
   isDisabled,
   onPress,
   onPressStart,

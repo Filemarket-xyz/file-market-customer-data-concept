@@ -16,7 +16,7 @@ export const ButtonGlowing = React.forwardRef<HTMLButtonElement, Omit<ButtonProp
       <Button
         {...buttonProps}
         ref={buttonRef}
-        variant='glowing'
+        variant="glowing"
       >
         {children}
       </Button>
