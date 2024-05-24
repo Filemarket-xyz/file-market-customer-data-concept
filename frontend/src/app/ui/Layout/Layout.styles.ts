@@ -8,6 +8,8 @@ export const StyledLayout = styled('main', {
 })
 
 export const StyledBody = styled('div', {
+  paddingTop: '$sizes$header',
   width: '100%',
-  height: '100%',
+  height: '100svh',
+  minHeight: '100svh',
 })

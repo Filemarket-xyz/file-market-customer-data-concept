@@ -1,5 +1,7 @@
 import { styled } from '~/shared/styles'
 
+export const headerHeight = 80
+
 export const StyledHeader = styled('header', {
   width: '100%',
   position: 'fixed',
@@ -12,5 +14,5 @@ export const StyledHeader = styled('header', {
   background: 'rgba(249, 249, 249, 0.75)',
   backdropFilter: 'blur(14px)',
   transition: 'all 0.5s',
-  height: 80,
+  height: '$sizes$header',
 })

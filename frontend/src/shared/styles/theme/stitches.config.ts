@@ -57,6 +57,10 @@ export const {
       6: '80px',
     },
 
+    sizes: {
+      header: '80px',
+    },
+
     fonts: {
       h: 'Montserrat, sans-serif',
       body: 'Montserrat, sans-serif',
@@ -216,5 +220,6 @@ export const {
 })
 
 export type Theme = typeof theme
+export type ThemeColors = Theme['colors']
 export type ThemeConfig = typeof config
 export type AppCSS = CSS<ThemeConfig>

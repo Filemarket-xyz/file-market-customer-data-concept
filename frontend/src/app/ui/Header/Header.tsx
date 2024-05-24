@@ -3,8 +3,8 @@ import React from 'react'
 import { ConnectButton } from '~/features/Connect'
 import { Container, Flex } from '~/shared/ui'
 
+import { Logo } from '../../../entities/Logo/ui'
 import { StyledHeader } from './Header.styles'
-import { HeaderLogo } from './Logo'
 
 export const Header: React.FC = () => {
   return (
@@ -12,12 +12,12 @@ export const Header: React.FC = () => {
       <Container fullHeight>
         <Flex
           fullHeight
-          justifyContent='space-between'
-          alignItems="center"
-          flexWrap="nowrap"
           gap={30}
+          alignItems="center"
+          justifyContent="space-between"
+          flexWrap="nowrap"
         >
-          <HeaderLogo />
+          <Logo />
           <ConnectButton />
         </Flex>
       </Container>

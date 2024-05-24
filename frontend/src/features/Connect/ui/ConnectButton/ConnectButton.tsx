@@ -6,7 +6,7 @@ import { useSignMessage } from 'wagmi'
 import { client } from '~/shared/lib'
 import { Button } from '~/shared/ui'
 
-const metamask = createWallet("io.metamask")
+const metamask = createWallet('io.metamask')
 
 export const ConnectButton: React.FC = () => {
   const { connect, isConnecting } = useConnect()
@@ -30,7 +30,7 @@ export const ConnectButton: React.FC = () => {
 
   return (
     <Button
-      variant='secondary'
+      variant="secondary"
       size="small"
       loading={isConnecting}
       onPress={onPress}
