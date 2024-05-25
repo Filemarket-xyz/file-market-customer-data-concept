@@ -12,7 +12,7 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        target: '',
+        target: 'https://fm-concept.customapp.tech/',
         changeOrigin: true,
       },
     },
