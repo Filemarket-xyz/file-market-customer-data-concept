@@ -27,7 +27,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       ref={buttonRef}
     >
       {children}
-      <Loading color="disabled" loading={loading} size={20} />
+      <Loading
+        color={props.variant === 'glowing' ? 'primary' : 'disabled'}
+        loading={loading}
+        size={20}
+        fullWidth={false}
+      />
     </StyledButton>
   )
 })

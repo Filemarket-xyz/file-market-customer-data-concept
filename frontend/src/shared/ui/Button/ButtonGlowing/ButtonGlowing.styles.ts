@@ -26,7 +26,6 @@ export const StyledWrapper = styled('div', {
 
 export const StyledGlow = styled('div', {
   position: 'absolute',
-  content: '',
   top: 8,
   left: 0,
   right: 0,
