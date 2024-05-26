@@ -9,6 +9,9 @@ import InterRegularWoff2 from '../fonts/Inter-Regular.woff2'
 import MontserratBoldTtf from '../fonts/Montserrat-Bold.ttf'
 import MontserratBoldWoff from '../fonts/Montserrat-Bold.woff'
 import MontserratBoldWoff2 from '../fonts/Montserrat-Bold.woff2'
+import MontserratMediumTtf from '../fonts/Montserrat-Medium.ttf'
+import MontserratMediumWoff from '../fonts/Montserrat-Medium.woff'
+import MontserratMediumWoff2 from '../fonts/Montserrat-Medium.woff2'
 import MontserratRegularTtf from '../fonts/Montserrat-Regular.ttf'
 import MontserratRegularWoff from '../fonts/Montserrat-Regular.woff'
 import MontserratRegularWoff2 from '../fonts/Montserrat-Regular.woff2'
@@ -56,6 +59,14 @@ export const globalStyles = globalCss({
       fontFamily: 'Montserrat',
       fontStyle: 'normal',
       fontWeight: 500,
+      src: `url('${MontserratMediumWoff2}') format('woff2'),
+            url('${MontserratMediumWoff}') format('woff'),
+            url('${MontserratMediumTtf}') format('truetype')`,
+    },
+    {
+      fontFamily: 'Montserrat',
+      fontStyle: 'normal',
+      fontWeight: 600,
       src: `url('${MontserratSemiBoldWoff2}') format('woff2'),
             url('${MontserratSemiBoldWoff}') format('woff'),
             url('${MontserratSemiBoldTtf}') format('truetype')`,
@@ -63,7 +74,7 @@ export const globalStyles = globalCss({
     {
       fontFamily: 'Montserrat',
       fontStyle: 'normal',
-      fontWeight: 600,
+      fontWeight: 700,
       src: `url('${MontserratBoldWoff2}') format('woff2'),
             url('${MontserratBoldWoff}') format('woff'),
             url('${MontserratBoldTtf}') format('truetype')`,
