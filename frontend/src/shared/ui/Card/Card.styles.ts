@@ -53,7 +53,9 @@ export const StyledRoot = styled('div', {
           background: '$gray100',
         },
       },
-      flat: {
+    },
+    disableShadow: {
+      true: {
         background: 'transparent',
         boxShadow: 'none',
       },
