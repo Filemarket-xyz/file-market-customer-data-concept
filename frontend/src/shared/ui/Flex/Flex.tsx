@@ -4,7 +4,7 @@ import { AppCSS } from '~/shared/styles'
 
 import { StyledDiv } from './Flex.styles'
 
-interface FlexProps extends PropsWithChildren, Pick<AppCSS, 'gap' | 'alignItems' | 'justifyContent' | 'flexDirection' | 'flexWrap' | 'flexGrow'> {
+export interface FlexProps extends PropsWithChildren, Pick<AppCSS, 'gap' | 'alignItems' | 'justifyContent' | 'flexDirection' | 'flexWrap' | 'flexGrow'> {
   css?: AppCSS
   fullWidth?: boolean
   fullHeight?: boolean

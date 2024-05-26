@@ -135,7 +135,7 @@ export const FooterTop: React.FC = () => {
       flexWrap="wrap"
     >
       <StyledFirstColumnFlex
-        gap="$3"
+        gap={16}
         flexDirection="column"
       >
         <Logo color="$white" />
@@ -149,7 +149,7 @@ export const FooterTop: React.FC = () => {
       {columns.map(({ title, links }) => (
         <StyledMiddleColumnFlex
           key={title}
-          gap="$3"
+          gap={16}
           flexDirection="column"
         >
           <StyledH4>{title}</StyledH4>
@@ -170,7 +170,7 @@ export const FooterTop: React.FC = () => {
         </StyledMiddleColumnFlex>
       ))}
       <StyledLastColumnFlex
-        gap="$3"
+        gap={16}
         flexDirection="column"
       >
         <StyledH4>Join our community</StyledH4>

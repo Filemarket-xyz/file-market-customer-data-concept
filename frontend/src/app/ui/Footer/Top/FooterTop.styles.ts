@@ -2,7 +2,7 @@ import { styled } from '~/shared/styles'
 import { Flex, Link, textVariant } from '~/shared/ui'
 
 export const StyledWrapperFlex = styled(Flex, {
-  gap: '$3',
+  gap: 16,
   justifyContent: 'space-between',
   '@sm': {
     justifyContent: 'flex-start',
@@ -51,7 +51,7 @@ export const StyledLink = styled(Link, {
   gap: '4px',
   background: '$gray800',
   borderRadius: '8px',
-  paddingLR: '$3',
+  paddingLR: 16,
   '@lg': {
     justifyContent: 'center',
     flex: '1 0 33%',

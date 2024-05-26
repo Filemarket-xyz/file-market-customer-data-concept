@@ -24,7 +24,7 @@ export const Icon: React.FC<IconProps> = ({ name, className, size = 20, css, col
           minHeight: size,
           minWidth: size,
         } : undefined),
-        '& > *': {
+        '& *': {
           color,
           fill: color,
         },

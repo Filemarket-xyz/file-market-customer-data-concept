@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ConnectButton } from '~/features/Connect'
+import { ConnectButton } from '~/features/Auth'
 import { Container, Flex } from '~/shared/ui'
 
 import { Logo } from '../../../entities/Logo/ui'
@@ -12,13 +12,13 @@ export const Header: React.FC = () => {
       <Container fullHeight>
         <Flex
           fullHeight
-          gap={30}
+          gap={16}
           alignItems="center"
           justifyContent="space-between"
           flexWrap="nowrap"
         >
           <Logo />
-          <ConnectButton />
+          <ConnectButton size="small" />
         </Flex>
       </Container>
     </StyledHeader>

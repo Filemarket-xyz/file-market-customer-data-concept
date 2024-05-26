@@ -4,7 +4,7 @@ import { Container } from '~/shared/ui'
 export const StyledFooter = styled('footer', {
   width: '100%',
   backdropFilter: 'blur(12.5px)',
-  boxShadow: '$footer',
+  boxShadow: '0px -4px 15px rgba(19, 19, 45, 0.05)',
   background: '#131416',
   color: '$white',
 })

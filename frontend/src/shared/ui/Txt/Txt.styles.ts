@@ -68,6 +68,10 @@ export const Txt = styled('span', {
     ternary2: textVariant('ternary2'),
     ternary3: textVariant('ternary3'),
 
+    fourfold1: textVariant('fourfold1'),
+    fourfold2: textVariant('fourfold2'),
+    fourfold3: textVariant('fourfold3'),
+
     color: {
       ...colorVariants,
     },

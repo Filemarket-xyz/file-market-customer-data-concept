@@ -1,12 +1,14 @@
-import { ComponentProps, forwardRef } from 'react'
+import { VariantProps } from '@stitches/react'
+import { forwardRef } from 'react'
 import { AriaButtonProps } from 'react-aria'
 
 import { Loading } from '../Loading'
 import { StyledButton } from './Button.styles'
 import { useButton } from './useButton'
 
-export interface ButtonProps extends AriaButtonProps, Omit<ComponentProps<typeof StyledButton>, 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'isDisabled'> {
+export interface ButtonProps extends AriaButtonProps, Omit<VariantProps<typeof StyledButton>, 'isDisabled'> {
   loading?: boolean
+  className?: string
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
@@ -27,7 +29,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
       ref={buttonRef}
     >
       {children}
-      <Loading color="disabled" loading={loading} size={20} />
+      <Loading
+        color={props.variant === 'glowing' ? 'primary' : 'disabled'}
+        loading={loading}
+        size={20}
+        fullWidth={false}
+      />
     </StyledButton>
   )
 })

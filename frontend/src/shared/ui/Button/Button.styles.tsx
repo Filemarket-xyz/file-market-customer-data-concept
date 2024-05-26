@@ -8,7 +8,7 @@ export const StyledButton = styled('button', {
   minWidth: '160px',
   outline: 'none',
   border: 'none',
-  borderRadius: '$1',
+  borderRadius: 8,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -86,7 +86,7 @@ export const StyledButton = styled('button', {
         color: '$blue500',
         border: '2px solid $blue500',
         background: '$white',
-        borderRadius: '$2',
+        borderRadius: 12,
         '&[data-hovered=true]': {
           opacity: 1,
           color: '$blue300',
@@ -103,7 +103,7 @@ export const StyledButton = styled('button', {
     },
     loading: {
       true: {
-        gap: '$2',
+        gap: 8,
       },
     },
     fullWidth: {

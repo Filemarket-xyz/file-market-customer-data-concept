@@ -5,7 +5,7 @@ export const StyledFlex = styled(Flex, {
   '@sm': {
     flexFlow: 'column-reverse wrap',
     alignItems: 'center',
-    gap: '$3',
+    gap: 16,
   },
 })
 
