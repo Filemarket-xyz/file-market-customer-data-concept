@@ -16,7 +16,7 @@ export const ActionCard: React.FC<ActionCardProps> = ({
   iconName,
   title,
   description,
-  variant = 'outline',
+  variant,
 }) => {
   return (
     <Card variant={variant} padding={32}>

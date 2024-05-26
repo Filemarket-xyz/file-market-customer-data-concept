@@ -13,7 +13,7 @@ export interface InfoCardProps {
 
 export const InfoCard: React.FC<InfoCardProps> = ({ titlePrefix, title, description }) => {
   return (
-    <Card>
+    <Card variant="elevated">
       <Flex gap={32} flexDirection="column" alignItems="center">
         <CardTitle prefix={titlePrefix}>
           {title}

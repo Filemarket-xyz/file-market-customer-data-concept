@@ -34,7 +34,7 @@ export const {
       gray200: '#E5E5E5',
       gray300: '#E9E9EA', // raisin + 90%
       gray400: '#A7A8A9', // raisin + 60%
-      gray500: '#59596C',
+      gray500: '#6B6F76',
       gray600: '#656669', // raisin + 30%
       gray700: '#2F3134',
       gray800: '#232528', // raisin

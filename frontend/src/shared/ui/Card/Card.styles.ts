@@ -15,16 +15,16 @@ export const StyledLayout = styled('div', {
 
 export const StyledRoot = styled('div', {
   borderRadius: 16,
-  border: '2px solid #6B6F76',
+  border: '2px solid $gray200',
   variants: {
     variant: {
-      elevate: {
+      elevated: {
         background: '$white',
         boxShadow: '8px 8px 0px 0px #13141540',
+        borderColor: '$gray500',
       },
-      outline: {
-        borderColor: '$gray200',
-        background: 'gray100',
+      outlined: {
+        background: '$gray100',
         boxShadow: '0px 0px 15px 0px #13132D0D',
       },
       gradient: {
@@ -52,6 +52,10 @@ export const StyledRoot = styled('div', {
           margin: 2,
           background: '$gray100',
         },
+      },
+      flat: {
+        background: 'transparent',
+        boxShadow: 'none',
       },
     },
   },
