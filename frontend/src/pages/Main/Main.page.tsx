@@ -6,8 +6,8 @@ import { StyledConnectButton, StyledContainer, StyledContentFlex, StyledIcon, St
 
 export const MainPage: React.FC = () => {
   return (
-    <StyledContainer fullHeight>
-      <StyledWrapperFlex fullHeight alignItems="center">
+    <StyledContainer>
+      <StyledWrapperFlex alignItems="center">
         <StyledContentFlex flexDirection="column" gap={64}>
           <Flex flexDirection="column" gap={32}>
             <Txt fourfold1>

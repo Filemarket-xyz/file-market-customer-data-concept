@@ -8,6 +8,7 @@ export const StyledContainer = styled(Container, {
 })
 
 export const StyledWrapperFlex = styled(Flex, {
+  height: 'calc(100vh - $sizes$header)',
   paddingTB: 20,
   justifyContent: 'center',
   gap: 100,
