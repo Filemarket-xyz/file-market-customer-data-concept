@@ -12,7 +12,7 @@ export const Header: React.FC = () => {
       <Container fullHeight>
         <Flex
           fullHeight
-          gap="$3"
+          gap={16}
           alignItems="center"
           justifyContent="space-between"
           flexWrap="nowrap"

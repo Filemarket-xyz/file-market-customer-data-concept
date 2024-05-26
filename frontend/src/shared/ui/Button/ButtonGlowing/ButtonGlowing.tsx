@@ -1,28 +1,25 @@
 import React from 'react'
 
 import { Button, ButtonProps } from '../Button'
-import { useButton } from '../useButton'
 import { StyledGlow, StyledWrapper } from './ButtonGlowing.styles'
 
-export const ButtonGlowing = React.forwardRef<HTMLButtonElement, Omit<ButtonProps, 'variant'>>(({
+export interface ButtonGlowingProps extends Omit<ButtonProps, 'variant'> {}
+
+export const ButtonGlowing = React.forwardRef<HTMLButtonElement, ButtonGlowingProps>(({
   children,
   className,
   isDisabled,
   loading,
   ...props
 }, ref) => {
-  const { buttonRef, buttonProps } = useButton({
-    ...props,
-    loading,
-    isDisabled: isDisabled || loading,
-  }, ref)
-
   return (
     <StyledWrapper fullWidth={props.fullWidth} className={className}>
       <StyledGlow isDisabled={isDisabled || loading} />
       <Button
-        {...buttonProps}
-        ref={buttonRef}
+        ref={ref}
+        {...props}
+        loading={loading}
+        isDisabled={isDisabled || loading}
         variant="glowing"
       >
         {children}

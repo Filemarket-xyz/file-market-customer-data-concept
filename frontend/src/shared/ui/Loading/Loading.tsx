@@ -1,9 +1,10 @@
-import React, { ComponentProps, type PropsWithChildren } from 'react'
+import { VariantProps } from '@stitches/react'
+import React, { type PropsWithChildren } from 'react'
 
 import { Flex, FlexProps } from '../Flex'
 import { StyledDiv } from './Loading.styles'
 
-interface LoadingProps extends PropsWithChildren, ComponentProps<typeof StyledDiv>, Pick<FlexProps, 'fullWidth' | 'fullHeight'> {
+interface LoadingProps extends PropsWithChildren, VariantProps<typeof StyledDiv>, Pick<FlexProps, 'fullWidth' | 'fullHeight'> {
   loading?: boolean
   size?: number
 }
@@ -28,10 +29,7 @@ export const Loading: React.FC<LoadingProps> = ({
         >
           <StyledDiv
             {...props}
-            css={{
-              size,
-              ...props.css,
-            }}
+            css={{ size }}
           />
         </Flex>
       ) : (

@@ -1,10 +1,11 @@
-import { type ComponentProps, forwardRef } from 'react'
+import { VariantProps } from '@stitches/react'
+import { forwardRef } from 'react'
 import { NavLinkProps, To } from 'react-router-dom'
 
 import { StyledAnhor, StyledNavLink } from './Link.styles'
 import { AriaAnhorButtonProps, useLink } from './useLink'
 
-export interface LinkProps extends Omit<NavLinkProps, 'children' | 'className' | 'style' | 'color' | 'to'>, AriaAnhorButtonProps, ComponentProps<typeof StyledAnhor> {
+export interface LinkProps extends Omit<NavLinkProps, 'children' | 'className' | 'style' | 'color' | 'to'>, AriaAnhorButtonProps, VariantProps<typeof StyledAnhor> {
   to?: To
 }
 

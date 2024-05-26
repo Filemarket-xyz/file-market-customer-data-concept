@@ -1,12 +1,14 @@
-import { ComponentProps, forwardRef } from 'react'
+import { VariantProps } from '@stitches/react'
+import { forwardRef } from 'react'
 import { AriaButtonProps } from 'react-aria'
 
 import { Loading } from '../Loading'
 import { StyledButton } from './Button.styles'
 import { useButton } from './useButton'
 
-export interface ButtonProps extends AriaButtonProps, Omit<ComponentProps<typeof StyledButton>, 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'isDisabled'> {
+export interface ButtonProps extends AriaButtonProps, Omit<VariantProps<typeof StyledButton>, 'isDisabled'> {
   loading?: boolean
+  className?: string
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
